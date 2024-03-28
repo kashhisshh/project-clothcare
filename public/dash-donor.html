@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard Donor</title>
+    <link rel="icon" type="image/x-icon" href="./pics/icon.jpg">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="script/angular.min.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.7.0.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      #wait {
+        display: none;
+      }
+    </style>
+    <script>
+      //-------------------| Profile Button |----------------------
+      function openPP() {
+        window.location.href = "profile-donor.html";
+      }
+      function openAM() {
+        window.location.href = "avail-med.html";
+      }
+      function openMM() {
+        window.location.href = "med-manager.html";
+      }
+
+      //============|| AJAX ||=================
+      $(document).ready(function () {
+        if (localStorage.getItem("activeKuch") == undefined) {
+          location.href = "index.html";
+          return;
+        }
+
+        //-------------| Checking Email Existence |------------
+        $("#setEmail").blur(function () {
+          var emailKu = $(this).val();
+          // alert(emailKu);
+          var objSet = {
+            type: "get",
+            url: "/chk-settings-email",
+            data: {
+              kuchEmail: emailKu,
+            },
+          };
+
+          $.ajax(objSet)
+            .done(function (respKuch) {
+              if (respKuch == "Invalid Email-Id") alert(respKuch);
+            })
+            .fail(function (errKuch) {
+              console.log(errKuch);
+            });
+        });
+
+        //-------------| Update Password Button |---------------
+        $("#btnUpdatePwd").click(function () {
+          var emailKu = $("#setEmail").val();
+          var oPwd = $("#setOldPwd").val();
+          var nPwd = $("#setNewPwd").val();
+          var cPwd = $("#setCnfPwd").val();
+          if (oPwd == "" || nPwd == "" || cPwd == "") {
+            alert("Enter all Columns First ");
+            return;
+          }
+          if (oPwd != nPwd && nPwd == cPwd) {
+            var objU = {
+              type: "get",
+              url: "/updatePwd",
+              data: {
+                email: emailKu,
+                oldPwd: oPwd,
+                newPwd: nPwd,
+              },
+            };
+
+            $.ajax(objU)
+              .done(function (response) {
+                alert(response);
+              })
+              .fail(function (err) {
+                // console.log(err);
+                alert(err);
+              });
+          } else if (oPwd == nPwd)
+            alert("New Password must not be same as Old Password");
+          else if (nPwd != cPwd)
+            alert("New Password and Confirm Password must be same");
+        });
+
+        //-----------------| Logout Button |-----------------------
+        $("#logout").click(function () {
+          localStorage.removeItem("activeKuch");
+          location.href = "index.html";
+        });
+        //--------------------------------------------------------
+
+        //---------| Email Fixing |------------
+        function setActiveUser() {
+          var actUser = localStorage.getItem("activeKuch");
+          // alert(actUser);
+          $("#setEmail").val(actUser).prop("readonly", true);
+        }
+        setActiveUser();
+        //----------------------------------------
+
+        //-------| Enabling the Eye( For Old PassWord) |--------
+        $("#eye1").mouseup(function () {
+          $(this).addClass("fa-eye").removeClass("fa-eye-slash");
+          $("#setOldPwd").prop("type", "password");
+        });
+        //-------
+        $("#eye1").mousedown(function () {
+          $(this).removeClass("fa-eye").addClass("fa-eye-slash");
+          $("#setOldPwd").prop("type", "text");
+        });
+
+        //-------| Enabling the Eye( For New PassWord) |--------
+        $("#eye2").mouseup(function () {
+          $(this).addClass("fa-eye").removeClass("fa-eye-slash");
+          $("#setNewPwd").prop("type", "password");
+        });
+        //-------
+        $("#eye2").mousedown(function () {
+          $(this).removeClass("fa-eye").addClass("fa-eye-slash");
+          $("#setNewPwd").prop("type", "text");
+        });
+
+        //-------| Enabling the Eye( For Confirm PassWord) |--------
+        $("#eye3").mouseup(function () {
+          $(this).removeClass("fa-eye").addClass("fa-eye-slash");
+          $("#setCnfPwd").prop("type", "password");
+        });
+        //-------
+        $("#eye3").mousedown(function () {
+          $(this).addClass("fa-eye").removeClass("fa-eye-slash");
+          $("#setCnfPwd").prop("type", "text");
+        });
+        //----------------------------------
+      });
+    </script>
+     <link rel="stylesheet" href="index.css">
+  </head>
+  <body>
+    <!-----------------| Navbar |---------------------->
+    <div>
+      <nav
+        class="navbar fixed-top bg-light border-bottom border-bottom-dark md-5"
+        data-bs-theme="LIght"
+      >
+        <div class="container-fluid">
+          <a class="navbar-brand" href="http://localhost:3000/dash-donor.html">
+            <div>
+              <img
+              src="pics/icon.jpg"
+                alt="Logo"
+                width="50"
+                height="44"
+                class="d-inline-block align-text-top"
+              />
+              <div
+            style="color: rgb(255, 69, 69)"
+            class="d-inline-block align-text-top name"
+          >
+                <h2><b>ClothCare</b></h2>
+              </div>
+            </div>
+          </a>
+          <form class="d-flex" role="search">
+            <button class="btn btn-outline-danger"
+            style="color: rgb(255, 69, 69)" type="button" id="logout">
+              Logout
+            </button>
+          </form>
+        </div>
+      </nav>
+    </div>
+    <br /><br /><br />
+    <!-------------| Container |--------------------------->
+    <div
+      class="container col-md-12 mt-4 ms-2"
+      style="display: flex; flex-direction: row; gap: 20px"
+    >
+      <!--------------------------| Profile |--------------------------------->
+      <div class="card col-md-3 mt-5 ms-5 cardd" style="width: 18rem;border: rgb(255, 255, 255) solid 2px;" onclick="openPP()">
+
+        <div class="mt-2">
+          <img
+            src="pics/profile.png"
+            class="rounded mx-auto d-block mb-3"
+            style="background-size: contain"
+            alt="..."
+          />
+        </div>
+        <div style="background-color:cornsilk">
+          <div class="card-body">
+            <h5 class="card-title" style="color: rgb(255, 69, 69)">Profile</h5>
+            <p class="card-text">
+              Update your donor profile effortlessly by clicking here, ensuring your vital details such as name, contact information, and gender remain current for seamless cloth donations.
+            </p>
+          </div>
+        </div>
+      </div>
+      <!----------------------| Avail Medicine |----------------------------->
+      <div class="card col-md-3 mt-5 ms-5 cardd" style="width: 18rem;border: rgb(255, 255, 255) solid 2px;" onclick="openAM()">
+        <div class="mt-2">
+          <img
+            src="pics/dclothes.jpg"
+            class="rounded mx-auto d-block"
+            style="background-size: contain"
+            alt="..."
+          />
+        </div>
+        <div style="background-color: rgb(171, 231, 255)">
+          <div class="card-body">
+            <h5 class="card-title" style="color: rgb(255, 69, 69)">Donate Clothes</h5>
+            <p class="card-text">
+              "Easily contribute to our cause by donating clothes through our user-friendly platform. Click here to make a difference and help those in need."
+            </p>
+           
+          </div>
+        </div>
+      </div>
+      <!---------------------| Medicine Manager |----------------------------->
+      <div class="card col-md-3 mt-5 ms-5 cardd" style="width: 18rem;border: rgb(255, 255, 255) solid 2px;" onclick="openMM()">
+        <div class="mt-2">
+          <img
+            src="pics/manager.png"
+            class="rounded mx-auto d-block"
+            style="background-size: contain"
+            alt="..."
+          />
+        </div>
+        <div style="background-color: cornsilk">
+          <div class="card-body">
+            <h5 class="card-title" style="color: rgb(255, 69, 69)">Clothes Manager</h5>
+            <p class="card-text">
+              Effortlessly manage your donated clothes inventory with our intuitive Clothes Manager feature. Click here to stay organized and track your contributions with ease.
+            </p>
+            
+          </div>
+        </div>
+      </div>
+      <!-------------------------| Setting |--------------------------------->
+      <div class="card col-md-3 mt-5 ms-5 cardd" style="width: 18rem;border: rgb(255, 255, 255) solid 2px;" data-bs-toggle="modal"
+      data-bs-target="#set">
+        <div class="mt-2">
+          <img
+            src="pics/settings.jpg"
+            class="rounded mx-auto d-block"
+            style="background-size: contain"
+            alt="..."
+          />
+        </div>
+        <div style="background-color:  rgb(171, 231, 255)">
+          <div class="card-body">
+            <h5 class="card-title" style="color: blue"><b>Settings</b></h5>
+            <p class="card-text">
+              Safeguard your account with ease by updating your password in our Settings section. Click here to ensure your account remains secure and protected.
+            </p>
+           
+          </div>
+        </div>
+      </div>
+    </div>
+    <!----------------------| Container Ends |--------------------------->
+
+    <!------------------| Settings Modal |-------------------->
+    <div
+      class="modal fade"
+      id="set"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <!-- modal-dialog-centered -->
+        <div class="modal-content" style="background-color: rgba(255, 255,255, 0.85)">
+          <form method="get" enctype="multipart/form-data">
+            <input type="hidden" id="hdn" name="hdn" />
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel" style="color: rgb(255, 69, 69)">Settings</h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div>
+                <center>
+                  <h3><b>Change Password</b></h3>
+                </center>
+              </div>
+
+              <div class="form mb-3">
+                <label for="floatingInput"><b>Email Id</b></label>
+                <input
+                  type="text"
+                  class="form-control mt-2"
+                  name="setEmail"
+                  id="setEmail"
+                  placeholder="name@example.com"
+                  autofocus
+                />
+                <span id="errSetEmail"></span>
+              </div>
+              <!-- | password Input | -->
+              <div class="col-md-12">
+                <div>
+                  <label for="floatingInput"><b>Old Password</b></label>
+                </div>
+                <div style="display: flex; flex-direction: row">
+                  <div class="col-md-11">
+                    <input
+                      type="password"
+                      class="form-control mt-2"
+                      name="setOldPwd"
+                      id="setOldPwd"
+                      placeholder="Enter Your Old Password"
+                    />
+                  </div>
+                  <!--  | Eye | -->
+                  <center>
+                    <div class="col-md-1 mt-2">
+                      <i class="fa-solid fa-eye" id="eye1"></i>
+                    </div>
+                  </center>
+                </div>
+              </div>
+              <!-- --------------- -->
+              <!-- | password Input | -->
+              <div class="col-md-12">
+                <div>
+                  <label for="floatingInput"><b>New Password</b></label>
+                </div>
+                <div style="display: flex; flex-direction: row">
+                  <div class="col-md-11">
+                    <input
+                      type="password"
+                      class="form-control mt-2"
+                      name="setNewPwd"
+                      id="setNewPwd"
+                      placeholder="Enter Your New Password"
+                    />
+                  </div>
+                  <!--  | Eye | -->
+                  <center>
+                    <div class="col-md-1 mt-2">
+                      <i class="fa-solid fa-eye" id="eye2"></i>
+                    </div>
+                  </center>
+                </div>
+              </div>
+              <!-- --------------- -->
+              <!-- | password Input | -->
+              <div class="col-md-12">
+                <div>
+                  <label for="floatingInput"><b>Confirm Password</b></label>
+                </div>
+                <div style="display: flex; flex-direction: row">
+                  <div class="col-md-11">
+                    <input
+                      type="password"
+                      class="form-control mt-2"
+                      name="setCnfPwd"
+                      id="setCnfPwd"
+                      placeholder="Confirm Your Password"
+                    />
+                  </div>
+                  <!--  | Eye | -->
+                  <center>
+                    <div class="col-md-1 mt-2">
+                      <i class="fa-solid fa-eye" id="eye3"></i>
+                    </div>
+                  </center>
+                </div>
+              </div>
+              <!--  -->
+            </div>
+            <!-- ----------------- -->
+            <div class="modal-footer">
+              <center>
+                <button class="btn "
+                style="color: rgb(255, 69, 69);border: 2px solid red;" id="btnUpdatePwd">
+                  Update Password
+                </button>
+              </center>
+              <div>
+                <center><span id="errUpdatePwd"></span></center>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

@@ -1,0 +1,34 @@
+.services{
+    color:rgb(255, 69, 69);
+}
+
+
+.nav{
+    background-color: white;
+}
+.btn.active{
+    font-size: 20px;
+    text-decoration: dashed;
+}
+.btn:hover{
+    font-size: 20px;
+    text-decoration: underline;
+    color: red;
+}
+.cardd {
+    
+   width: 100%;
+   height: fit-content;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease; /* Smooth transition for all properties */
+}
+
+.cardd:hover {
+    cursor: pointer;
+    box-shadow: 10px 10px 15px rgba(173, 216, 230, 0.8);
+    transform: scale(1.05); /* Scale up slightly on hover */
+    /* Change background color on hover */
+    border-radius: 20px; /* Increase border radius on hover */
+}
+

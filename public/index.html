@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ClothCare</title>
+    <link rel="icon" type="image/x-icon" href="./pics/icon.jpg">
+    <link rel="stylesheet" href="index.css">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="script/angular.min.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.7.0.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      #wait {
+        display: none;
+      }
+    </style>
+    <script>
+      //===============|| AJAX for SignUp ||=====================
+      //====( || Ajax to Save data || )====
+
+      $(document).ready(function () {
+        //-------------| Checking Email Existence |-------------
+        $("#supEmail").blur(function () {
+          var emailKu = $(this).val();
+          var obj = {
+            type: "get",
+            url: "/chk-signup-email",
+            data: {
+              kuchemail: emailKu,
+            },
+          };
+
+          $.ajax(obj)
+            .done(function (respKuch) {
+              //alert(respKuch);
+              $("#errSupEmail").html(respKuch);
+              if (respKuch == "Already Taken...")
+                $("#errSupEmail").html(respKuch).css("color", "red");
+              else $("#errSupEmail").html(respKuch).css("color", "green");
+            })
+            .fail(function (errKuch) {
+              $("errSupEmail").html(errKuch);
+            });
+        });
+
+        //---------------| SignUp Button |-------------------
+
+        $("#btnSup").click(function () {
+          var emailKu = $("#supEmail").val();
+          var pwdKu = $("#supPwd").val();
+          var typeKu = $("#suplistType").val();
+          var obj = {
+            type: "get",
+            url: "/signup",
+            data: {
+              kuchEmail: emailKu,
+              kuchPwd: pwdKu,
+              kuchType: typeKu,
+            },
+          };
+          $.ajax(obj)
+            .done(function (response) {
+              // $("#errSup").html(response);
+              alert(response);
+            })
+            .fail(function (errKuch) {
+              $("#errSup").html(errKuch);
+            });
+        });
+
+        //--------| checking Password is correct or not |---------
+        $("#supPwd").blur(function () {
+          var r =
+            /(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
+          var pwd = $("#supPwd").val();
+        });
+
+        //-------| Enabling the Eye(PassWord Viewer) |--------
+        $(".fa-solid").mouseup(function () {
+          $(this).removeClass("fa-eye").addClass("fa-eye-slash");
+          $("#supPwd").prop("type", "password");
+        });
+        //-------
+        $(".fa-solid").mousedown(function () {
+          $(this).addClass("fa-eye").removeClass("fa-eye-slash");
+          $("#supPwd").prop("type", "text");
+        });
+
+        //----------------------------------------------------
+
+        //--------------| SignIn button |---------------------
+        $("#btnSin").click(function () {
+          var emailKu = $("#sinEmail").val();
+          var pwdKu = $("#sinPwd").val();
+          var objL = {
+            type: "get",
+            url: "/signin",
+            data: {
+              kuchSinEmail: emailKu,
+              kuchSinPwd: pwdKu,
+            },
+          };
+
+          $.ajax(objL)
+            .done(function (resp) {
+              localStorage.setItem("activeKuch", $("#sinEmail").val());
+              if (resp == "1") location.href = "dash-donor.html";
+              else if (resp == "2") location.href = "dash-needy.html";
+              else if (resp == "3") location.href = "dash-admin.html";
+              else alert(resp);
+            })
+            .fail(function (err) {
+              $("#btnSin").html(err);
+            });
+        });
+
+        //-------| Enabling the Eye(PassWord Viewer) |--------
+        $(".fa-solid").mouseup(function () {
+          $(this).removeClass("fa-eye").addClass("fa-eye-slash");
+          $("#sinPwd").prop("type", "password");
+        });
+        //-------
+        $(".fa-solid").mousedown(function () {
+          $(this).addClass("fa-eye").removeClass("fa-eye-slash");
+          $("#sinPwd").prop("type", "text");
+        });
+      });
+
+      //----------------------------------------------------
+    </script>
+  </head>
+  <body>
+    <!-- --------------------| NavBar |---------------------->
+    <nav class="navbar fixed-top nav">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="http://localhost:3000/">
+        <div>
+          <img
+            src="pics/icon.jpg"
+            alt="Logo"
+            width="50"
+            height="44"
+            class="d-inline-block align-text-top clothcare"
+          />
+          <div
+            style="color: rgb(255, 69, 69)"
+            class="d-inline-block align-text-top name"
+          >
+            <h2><b>ClothCare</b></h2>
+          </div>
+        
+        </div></a>
+        <div>
+          <button
+            class="btn"
+            style="color: rgb(255, 69, 69)"
+            data-bs-toggle="modal"
+            data-bs-target="#sUpModal"
+          >
+            Signup
+          </button>
+          <button
+            type="button"
+            class="btn"
+            style="color: rgb(255, 69, 69)"
+            data-bs-toggle="modal"
+            data-bs-target="#sInModal"
+            
+          >
+            Login
+          </button>
+        </div>
+      </div>
+    </nav>
+    <br /><br />
+    <!------------------| SignUp Modal |-------------------->
+    <div
+      class="modal fade"
+      id="sUpModal"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <!-- modal-dialog-centered -->
+        <div class="modal-content" style="background-color: rgba(255, 255,255, 0.85);">
+          <form method="get" enctype="multipart/form-data">
+            <input type="hidden" id="hdn" name="hdn" />
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Sign-Up</h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="col-md-12">
+              <center>
+                <img id="wait" src="pics/icons8-loading-infinity.gif" alt="" />
+              </center>
+            </div>
+            <div class="modal-body">
+              <div>
+                <img
+                  src="pics/welcome.jpg"
+                  class="rounded mx-auto d-block"
+                  width="80%"
+                  alt="..."
+                />
+              </div>
+
+              <div class="form mb-3">
+                <label for="floatingInput"><b>Email address</b></label>
+                <input
+                  type="text"
+                  class="form-control mt-2"
+                  name="supEmail"
+                  id="supEmail"
+                  placeholder="Email address"
+                  autofocus
+                />
+                <span id="errSupEmail"></span>
+              </div>
+
+              <!-- | password Input | -->
+              <div class="col-md-12">
+                <div>
+                  <label for="floatingInput"><b>Password</b></label>
+                </div>
+                <div style="display: flex; flex-direction: row">
+                  <div class="col-md-11">
+                    <input
+                      type="password"
+                      class="form-control mt-2"
+                      name="supPwd"
+                      id="supPwd"
+                      placeholder="Password"
+                    />
+                  </div>
+                  <!--  | Eye | -->
+                  <center>
+                    <div class="col-md-1 mt-2">
+                      <i class="fa-solid fa-eye"></i>
+                    </div>
+                  </center>
+                </div>
+              </div>
+              <!-- ------------ -->
+              <div class="col-md-12">
+                <b>Type</b>
+                <select
+                  class="form-select mt-2"
+                  aria-label="Default select example"
+                  name="suplistType"
+                  id="suplistType"
+                >
+                  <option selected>Choose</option>
+                  <option value="1">Donor</option>
+                  <option value="2">Reciever</option>
+                  <option value="3">Admin</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+            class="btn "
+            style="color: rgb(255, 69, 69);border: 2px solid red;"
+            id="btnSup"
+            name="btnSup"
+          >
+                Sign Up
+              </button>
+              <div>
+                <center><span id="errSup"></span></center>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!---------------------| Signin Modal |----------------------->
+    <div
+      class="modal fade"
+      id="sInModal"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color: rgba(255, 255,255, 0.85);">
+          <form method="get" enctype="multipart/form-data">
+            <input type="hidden" id="hdn" name="hdn" />
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Login Page</h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div>
+                <img
+                  src="pics/login.png"
+                  class="rounded mx-auto d-block"
+                  alt="..."
+                />
+              </div>
+
+              <div class="form mb-3">
+                <label for="floatingInput"><b>Email address</b></label>
+                <input
+                  type="text"
+                  class="form-control mt-2"
+                  name="sinEmail"
+                  id="sinEmail"
+                  placeholder="Email address"
+                  autofocus
+                />
+                <span id="errSinEmail"></span>
+              </div>
+
+              <!-- | password Input | -->
+              <div class="col-md-12 form mb-3">
+                <div>
+                  <label for="floatingInput"><b>Password</b></label>
+                </div>
+                <div style="display: flex; flex-direction: row">
+                  <div class="col-md-11">
+                    <input
+                      type="password"
+                      class="form-control mt-2"
+                      name="sinPwd"
+                      id="sinPwd"
+                      placeholder="Password"
+                      autofocus
+                    />
+                  </div>
+                  <!--  | Eye | -->
+                  <center>
+                    <div class="col-md-1 mt-2">
+                      <i class="fa-solid fa-eye"></i>
+                    </div>
+                  </center>
+                  <!-- ------------ -->
+                  <span id="errSinPwd"></span>
+                </div>
+              </div>
+            </div>
+            <!-- ------------------------------- -->
+            
+            <div class="modal-footer">
+              <button
+            class="btn center"
+            style="color: rgb(255, 69, 69);border: 2px solid red;"
+            id="btnSin"
+                name="btnSin"
+          >
+                Login
+              </button>
+              <div>
+                <center><span id="errSin"></span></center>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <br /><br />
+    <!-- --------------------------| Carousal |----------------------- -->
+    <div class="carousal">
+      <div
+        id="carouselExampleAutoplaying"
+        class="carousel slide"
+        data-bs-ride="carousel"
+      >
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img
+              src="pics/carousalPhoto4.jpg"
+              class="d-block w-100"
+              height="500px"
+              style="background-size: contain; background-repeat: no-repeat"
+              alt="..."
+            />
+          </div>
+          <div class="carousel-item">
+            <img
+              src="pics/carousalPhoto2.webp"
+              class="d-block w-100"
+              height="500px"
+              alt="..."
+            />
+          </div>
+          <div class="carousel-item">
+            <img
+              src="pics/carousalPhoto1.jpg"
+              class="d-block w-100"
+              height="500px"
+              alt="..."
+            />
+          </div>
+          <div class="carousel-item">
+            <img
+              src="pics/carousalPhoto3.png"
+              class="d-block w-100 h-300"
+              height="500px"
+              alt="..."
+            />
+          </div>
+        </div>
+        <button
+          class="carousel-control-prev"
+          type="button"
+          data-bs-target="#carouselExampleAutoplaying"
+          data-bs-slide="prev"
+        >
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button
+          class="carousel-control-next"
+          type="button"
+          data-bs-target="#carouselExampleAutoplaying"
+          data-bs-slide="next"
+        >
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </div>
+    <br />
+    <!-- ----------------------| Our Services |--------------------------- -->
+    <div class="col-md-12 mt-2">
+      <div style="background-color: white">
+        <center>
+          <h1 class="services"><b>Our Services</b></h1>
+        </center>
+      </div>
+    </div>
+    <br />
+    <!-------------| Container |--------------------------->
+    <div class="col-md-12">
+      <div
+        class="container col-md-12 ms-2"
+        style="display: flex; flex-direction: row; gap: 20px"
+      >
+        <!--------------------------| Donation |--------------------------------->
+        <div class="card col-md-3 mt-2 ms-5" style="width: 18rem; border: rgb(255, 255, 255) solid 2px;">
+          <div class="mt-2">
+            <img
+              src="pics/donation.jpg"
+              class="rounded w-100 d-block mb-2"
+              style="background-size: contain"
+              alt="..."
+            />
+          </div>
+          <div style="background-color: cornsilk">
+            <div class="card-body">
+              <h5 class="card-title" style="color: rgb(255, 69, 69)">Donation</h5>
+              <p class="card-text">
+                Some quick example text to build on the card title and make up
+                the bulk of the card's content.
+              </p>
+            </div>
+          </div>
+        </div>
+        <!----------------------| Needy |----------------------------->
+        <div class="card col-md-3 mt-2 ms-5" style="width: 18rem; border: white solid 2px;">
+          <div class="mt-2">
+            <img
+              src="pics/needy.png"
+              class="rounded w-100 d-block mb-2"
+              style="background-size: contain"
+              alt="..."
+            />
+          </div>
+          <div style="background-color: rgb(171, 231, 255)">
+            <div class="card-body">
+              <h5 class="card-title" style="color: rgb(255, 69, 69)">Needy</h5>
+              <p class="card-text">
+                Some quick example text to build on the card title and make up
+                the bulk of the card's content.
+              </p>
+            </div>
+          </div>
+        </div>
+        <!---------------------| Support 24X7 |----------------------------->
+        <div class="card col-md-3 mt-2 ms-5" style="width: 18rem; border: white solid 2px;">
+          <div class="mt-2">
+            <img
+              src="pics/247.jpg"
+              class="rounded w-100 d-block mb-2"
+              style="background-size: contain"
+              alt="..."
+            />
+          </div>
+          <div style="background-color: cornsilk">
+            <div class="card-body">
+              <h5 class="card-title" style="color: rgb(255, 69, 69)">Support 24X7</h5>
+              <p class="card-text">
+                Some quick example text to build on the card title and make up
+                the bulk of the card's content.
+              </p>
+            </div>
+          </div>
+        </div>
+        <!-------------------------| Terms and Conditions |--------------------------------->
+        <div class="card col-md-3 mt-2 ms-5" style="width: 18rem; border: white solid 2px;; border: white solid 2px;">
+          <div class="mt-2">
+            <img
+              src="pics/tnc.jpg"
+              class="rounded w-100 d-block mb-2"
+              style="background-size: contain"
+              alt="..."
+            />
+          </div>
+          <div style="background-color: rgb(171, 231, 255)">
+            <div class="card-body">
+              <h5 class="card-title" style="color: rgb(255, 69, 69)">
+                <b>Terms and Conditions</b>
+              </h5>
+              <p class="card-text">
+                Some quick example text to build on the card title and make up
+                the bulk of the card's content.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!----------------------| Container Ends |--------------------------->
+    <br /><br />
+    <!-- ----------------------| Developed By |--------------------------- -->
+    <div class="col-md-12 mt-2">
+      <div style="background-color: white">
+        <center>
+          <h2><b style="color: rgb(255, 69, 69);">Developed By</b></h2>
+        </center>
+      </div>
+    </div>
+    <br />
+    <!-- ---------------------------- -->
+    <div class="col-md-12">
+      <div
+        class="col-md-12"
+        style="display: flex; flex-direction: row; gap: 20px"
+      >
+        <!--  -->
+        <center>
+        <div class="ms-6" style="margin-left :500px;">
+          <div class="card mb-3" style="max-width: 540px">
+            <div class="row g-0">
+              <div class="col-md-4">
+                <img
+                  src="pics/kashish.jpg"
+                  class="img-fluid rounded-start"
+                  alt="..."
+                />
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title"><h3>Kashish</h3></h5>
+                  <p class="card-text">
+                    <b>MCA 2022-25</b> <br />
+                    kashishmcanit.com <br />
+                    <a href="http://www.nitrr.ac.in/" target="_blank">NIT Raipur</a> <br />
+                    Master of Computer Application
+                  </p>
+                  <p class="card-text">
+                    <small class="text-body-secondary"
+                      >Last updated 3 mins ago</small
+                    >
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </center>
+        <!--  -->
+      </div>
+    </div>
+    <br /><br />
+    <!-- --------------------------- -->
+    <!-- ----------------------| Reach Us |--------------------------- -->
+    <div>
+      <div class="col-md-12 mt-2">
+        <div style="background-color: white">
+          <center>
+            <h2 style="color: rgb(255, 69, 69);"><b>Reach Us</b></h2>
+          </center>
+        </div>
+      </div>
+      <br />
+      <center>
+        <iframe
+          src=https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d14874.196331166764!2d81.6050291!3d21.2497222!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a28dde213f66723%3A0x21543965c50c43c7!2sNational%20Institute%20of%20Technology(NIT)%2C%20Raipur!5e0!3m2!1sen!2sin!4v1711536924129!5m2!1sen!2sin"
+          width="600"
+          alt="NIT Raipur maps"
+          height="450"
+          style="border: 0"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </center>
+    </div>
+    <br /><br />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+      crossorigin="anonymous"
+    ></script>
+    <center>Copyright <b>Kashish</b> @2024s</center>
+  </body>
+</html>

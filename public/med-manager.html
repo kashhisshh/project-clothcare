@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Medicine Manager</title>
+    <link rel="stylesheet" href="indexx.css">
+    <link rel="icon" type="image/x-icon" href="./pics/icon.jpg">
+    <link
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="script/angular.min.js"></script>
+    <style>
+      .container {
+        background-color: rgba(255, 255,255, 0.85);
+        width: 1000px;
+        height: 630px;
+      }
+      body {
+        background-image: url(pics/bgPhoto2.jpeg);
+        background-size: contain;
+      }
+    </style>
+    <script>
+      //============|| AJAX for Email Checking ||============
+      $(document).ready(function () {
+        //-------------| Checking Email Existence |-------------
+        $("#txtEmail").blur(function () {
+          var emailKu = $(this).val();
+          var obj = {
+            type: "get",
+            url: "/chk-med-manager-email",
+            data: {
+              kuchEmail: emailKu,
+            },
+          };
+          $.ajax(obj)
+            .done(function (respKuch) {
+              if (respKuch == "Invalid Email-Id") alert("Invalid User Id");
+            })
+            .fail(function (errKuch) {
+              console.log(errKuch);
+            });
+        });
+      });
+      //========| Angular |========
+      var module = angular.module("myModule", []);
+      module.controller("myController", function ($scope, $http) {
+        $scope.jsonArray;
+
+        //---------------| Fetching Records |---------------------
+        $scope.getRecords = function () {
+          var url = "/get-med-avail-records";
+          $http.get(url).then(done, fail);
+          function done(response) {
+            alert(JSON.stringify(response.data));
+            $scope.jsonArray = response.data;
+          }
+          function fail(response) {
+            alert(response.data);
+          }
+        };
+
+        //-----------------| UnAvail Medicine |-----------------------
+        $scope.doUnAvail = function (srno) {
+          if (confirm("Are you Sure?...") == false) return;
+          var url = "/do-angular-unAvail?srnoKuch=" + srno; //+"&pwd="+pwdkuch;
+          $http.get(url).then(done, fail);
+          function done(response) {
+            alert(response.data);
+            $scope.getRecords();
+          }
+          function fail(response) {
+            alert(response.data);
+          }
+        };
+
+        //---------| Email Fixing |------------
+        function setActiveUser() {
+          var actUser = localStorage.getItem("activeKuch");
+          // alert(actUser);
+          $("#txtEmail").val(actUser).prop("readonly", true);
+        }
+        setActiveUser();
+        //----------------------------------------
+
+        //-----------------| Logout Button |-----------------------
+        $("#logout").click(function () {
+          localStorage.removeItem("activeKuch");
+          location.href = "index.html";
+        });
+        //--------------------------------------------------------
+      });
+    </script>
+  </head>
+  <body ng-app="myModule" ng-controller="myController">
+    <!-----------------| Navbar |---------------------->
+    <nav
+    class="navbar fixed-top bg-light border-bottom border-bottom-dark"
+    data-bs-theme="light"
+  >
+      <div class="container-fluid">
+        <a class="navbar-brand" href="http://localhost:3000/dash-donor.html">
+          <div>
+            <img
+            src="pics/icon.jpg"
+              alt="Logo"
+              width="50"
+              height="44"
+              class="d-inline-block align-text-top"
+            />
+            <div
+            style="color:  rgb(255, 69, 69)"
+            class="d-inline-block align-text-top">
+              <h2><b>ClothCare</b></h2>
+            </div>
+          </div>
+        </a>
+        <form class="d-flex" role="search">
+          <button class="btn btn-outline-danger" type="button" id="logout">
+            Logout
+          </button>
+        </form>
+      </div>
+    </nav>
+    <br /><br /><br />
+    <!---------------| Container |---------------------->
+    <div class="container mt-5 mb-5">
+      <div class="rwo col-md-12">
+        <!-- -------------------------------|  |------------------------------------------------------------------------ -->
+        <form method="post" enctype="multipart/form-data" class="row g-3">
+          <div class="form col-md-6">
+            <label for="floatingInput"><b style="color:  rgb(255, 69, 69)">Email address</b></label>
+            <input
+              type="text"
+              class="form-control mt-2"
+              name="txtEmail"
+              id="txtEmail"
+              autofocus
+            />
+          </div>
+          <!-- ---------------------------- -->
+          <div class="col-md-3 mt-4 ms-5">
+            <button
+              type="button"
+              ng-click="getRecords()"
+              class="btn btn-outline-danger btn-lg"
+            >
+              <b>Get Records</b>
+            </button>
+          </div>
+          <!-- --------------------------------------------------------------------------- -->
+          <table class="table table-success table-striped table-hover">
+            <thead class="table-dark">
+              <tr>
+                <th>Sr.No</th>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Quantity</th>
+                <th>Packing</th>
+                <th>Operations</th>
+                
+              </tr>
+            </thead>
+            <tr ng-repeat="obj in jsonArray">
+              <td>{{$index+1}}</td>
+              <td>{{obj.med}}</td>
+              <td>{{obj.expdate}}</td>
+              <td>{{obj.qty}}</td>
+              <td>{{obj.packing}}</td>
+              <td align="center">
+                <input
+                  type="button"
+                  value="UnAvail"
+                  ng-click="doUnAvail(obj.srno);"
+                />
+              </td>
+            </tr>
+          </table>
+          <!-- --------------------------------------------------------------------------------- -->
+
+          <!-- -------------------------------------------------------------------------- -->
+
+          <!-- ------------------------------------------------------------------------------- -->
+        </form>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

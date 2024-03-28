@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Donate Clothes</title>
+    <link rel="stylesheet" href="indexx.css">
+    <link rel="icon" type="image/x-icon" href="./pics/icon.jpg">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="script/angular.min.js"></script>
+    <style>
+      .container {
+background-color: rgba(255, 255,255, 0.85);
+        width: 1000px;
+        height: 400px;
+      }
+      body {
+        background-image: url(pics/bgPhoto2.jpeg);
+        background-size: contain;
+      }
+    </style>
+    <script>
+      //=========|| Use AJAX here to save data ||=============
+      $(document).ready(function () {
+        //-------------| Checking Email Existence |------------
+        $("#txtEmail").blur(function () {
+          var emailKu = $(this).val();
+          // alert(emailKu);
+          var obj = {
+            type: "get",
+            url: "/chk-avail-med-email",
+            data: {
+              kuchEmail: emailKu,
+            },
+          };
+
+          $.ajax(obj)
+            .done(function (respKuch) {
+              if (respKuch == "Invalid Email-Id") alert(respKuch);
+            })
+            .fail(function (errKuch) {
+              console.log(errKuch);
+            });
+        });
+
+        //---------------| Avail-Med Button |------------------
+        $("#btnAvailMed").click(function () {
+          var emailKu = $("#txtEmail").val();
+          var mName = $("#txtMedName").val();
+          var epDateku = $("#expDob").val();
+          var pkgku = $("#listPack").val();
+          var qtyku = $("#txtQty").val();
+
+          var objAM = {
+            type: "get",
+            url: "/availMed",
+            data: {
+              email: emailKu,
+              medName: mName,
+              expDate: epDateku,
+              package: pkgku,
+              quantity: qtyku,
+            },
+          };
+          $.ajax(objAM)
+            .done(function (response) {
+              alert(response);
+            })
+            .fail(function (err) {
+              // console.log(err);
+              $("#btnAvailMed").html(err);
+            });
+        });
+
+        //---------| Email Fixing |------------
+        function setActiveUser() {
+          var actUser = localStorage.getItem("activeKuch");
+          // alert(actUser);
+          $("#txtEmail").val(actUser).prop("readonly", true);
+        }
+        setActiveUser();
+        //-------------------------------------
+
+        //---------| Logout Button |-------------
+        $("#logout").click(function () {
+          localStorage.removeItem("activeKuch");
+          location.href = "index.html";
+        });
+        //---------------------------------------
+      });
+    </script>
+  </head>
+  <body>
+    <!-----------------| Navbar |---------------------->
+    <nav
+    class="navbar fixed-top bg-light border-bottom border-bottom-dark"
+    data-bs-theme="light"
+  >
+      <div class="container-fluid">
+        <a class="navbar-brand" href="http://localhost:3000/dash-donor.html">
+          <div>
+            <img
+            src="pics/icon.jpg"
+              alt="Logo"
+              width="50"
+              height="44"
+              class="d-inline-block align-text-top"
+            />
+            <div
+            style="color:  rgb(255, 69, 69)"
+            class="d-inline-block align-text-top"
+            >
+            <h2><b>ClothCare</b></h2>
+            </div>
+          </div>
+        </a>
+        <form class="d-flex" role="search">
+          <button class="btn btn-outline-danger" type="button" id="logout">
+            Logout
+          </button>
+        </form>
+      </div>
+    </nav>
+    <br /><br /><br /><br />
+    <!---------------| Container |---------------------->
+    <div class="container mt-3">
+      <div class="rwo col-md-12">
+        <!-- -------------------------------------------------------------------------------------------------------------------------- -->
+        <form method="post" enctype="multipart/form-data" class="row g-3 mt-3">
+          <div class="form mb-3 col-md-8">
+            <label for="floatingInput"><b>Email address</b></label>
+            <input
+              type="text"
+              class="form-control mt-2"
+              name="txtEmail"
+              id="txtEmail"
+              style="color:gray"
+            />
+          </div>
+          <!-- ------------------------------------------------------------------------------------------------------------------------ -->
+          <div class="col-md-6">
+            <label for="validationDefault01" class="form-label"
+              ><b>YourName</b></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              name="txtMedName"
+              id="txtMedName"
+              value=""
+              required
+              placeholder="Your Name"
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="validationDefault05" class="form-label"
+              ><b>Date</b></label
+            >
+            <input
+              type="date"
+              class="form-control"
+              name="expDob"
+              id="expDob"
+              required
+            />
+          </div>
+          <!-- ------------------------------------------------------------------------------------------------------------------------ -->
+          <div class="col-md-3">
+            <label for="validationDefault04" class="form-label"
+              ><b>Packing</b></label
+            >
+            <select class="form-select" name="listPack" id="listPack" required>
+              <option selected disabled value=""></option>
+              <option selected>Choose</option>
+              <option value="shirt">shirt</option>
+              <!-- value="Tablets" -->
+              <option value="jeans">jeans</option>
+              <option value="jacket">jacket</option>
+              <option value="t-shirt">t-shirt</option>
+              <option value="others">Others</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="validationDefault05" class="form-label"
+              ><b>Quantity</b></label
+            >
+            <input
+              type="nu]"
+              class="form-control"
+              name="txtQty"
+              id="txtQty"
+              required
+              placeholder="Enter Quantity"
+            />
+          </div>
+          <!-- ------------------------------------------------------------------------------------------------------------------------ -->
+          <center>
+            <button
+              type="button"
+              class="btn btn-primary"
+              name="btnAvailMed"
+              id="btnAvailMed"
+            >
+              Donate Clothes
+            </button>
+          </center>
+        </form>
+      </div>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
