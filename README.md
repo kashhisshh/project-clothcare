@@ -21,6 +21,7 @@ To get started with the application, follow these steps:
 Install Node.js if you haven't already: Node.js Installation
 Clone this repository to your local machine.
 Navigate to the project directory using the command line.
+
 Run **npm install** to install project dependencies.
 Run** npm init** to initialize the project.
 Install Express.js by running **npm i express**.
